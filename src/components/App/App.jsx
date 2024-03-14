@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 
-// import './App.css'
 import { Toaster } from 'react-hot-toast';
 import fetchPhoto from '../../api';
 import SearchBar from '../SearchBar/SearchBar';
@@ -12,14 +11,21 @@ import LoadMoreBtn from '../LoadMoreBtn/LoadMoreBtn';
 const App = () => {
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [images, setImages] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [totalPages, setTotalPages] = useState(2);
+  const [images, setImages] = useState({
+    items: [],
+    loading: false,
+    error: false,
+  });
 
-  const searchImages = newQuery => {
+  const onSearch = async newQuery => {
     setQuery(`${Date.now()}/${newQuery}`);
     setPage(1);
-    setImages([]);
+    setImages({
+      items: [],
+      loading: true,
+      error: false,
+    });
   };
 
   const handleLoadMore = () => {
@@ -33,29 +39,48 @@ const App = () => {
 
     async function fetchData() {
       try {
-        setLoading(true);
-        setError(false);
-        const fetchedData = await fetchPhoto(query.split('/')[1], page);
-        setImages(prevImages => [...prevImages, ...fetchedData]);
+        setImages(prevElements => ({
+          ...prevElements,
+          loading: true,
+          error: false,
+        }));
+        const response = await fetchPhoto(query, page);
+        setImages(prevElements => ({
+          ...prevElements,
+          items: [...prevElements.items, ...response.results],
+        }));
+
+        setImages(prevData => ({ ...prevData, loading: false, error: false }));
+
+        setTotalPages(response.total_pages);
       } catch (error) {
-        setError(true);
+        setImages(prevElements => ({
+          ...prevElements,
+          error: true,
+        }));
       } finally {
-        setLoading(false);
+        setImages(prevElements => ({
+          ...prevElements,
+          loading: false,
+        }));
       }
     }
+
     fetchData();
   }, [query, page]);
 
+  const { items, loading, error } = images;
+
   return (
     <div>
-      <SearchBar onSearch={searchImages} />
-      {images.length > 0 && <ImageGallery items={images} />}
-      {loading && <Loader />}
+      <SearchBar onSearch={onSearch} />
       {error && <ErrorMessage />}
-      {images.length > 0 && !loading && (
+      {items.length > 0 && <ImageGallery items={items} />}
+      {loading && <Loader />}
+      {items.length > 0 && !loading && page < totalPages && (
         <LoadMoreBtn onClick={handleLoadMore} />
       )}
-      <Toaster />
+      <Toaster position="top-right" />
     </div>
   );
 };

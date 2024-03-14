@@ -1,0 +1,11 @@
+.list {
+  line-height: 0;
+  column-count: 8;
+  column-gap: 0px;
+  margin: 0px;
+  padding: 10px;
+}
+
+.item {
+  margin: 10px 5px;
+}

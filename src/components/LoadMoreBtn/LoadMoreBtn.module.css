@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.button {
+  padding: 10px;
+  font-size: 20px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 5px 10px 15px green inset;
+  width: 250px;
+  background-color: transparent;
+  border: 2px solid green;
+  border-radius: 4px;
+}
+
+.button:hover {
+  background-color: green;
+}

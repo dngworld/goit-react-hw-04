@@ -8,7 +8,7 @@ const fetchPhoto = async (query, page) => {
       params: {
         query,
         page,
-        per_page: 26,
+        per_page: 16,
       },
     }
   );
